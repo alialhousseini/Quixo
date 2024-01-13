@@ -21,7 +21,7 @@ vec_env = make_vec_env(make_env, n_envs=5)
 model = PPO("MlpPolicy", vec_env, verbose=1,
             tensorboard_log="./ppo/", device='cuda')
 
-model = model.load("quixo_ppo_random_opponent_2M_previous")
+model = model.load("quixo_ppo_random_opponent_longest")
 
 model.set_env(vec_env)
 
@@ -30,5 +30,5 @@ try:
 except KeyboardInterrupt as e:
     print("Training interrupted")
     # Save the model
-    model.save("quixo_ppo_random_opponent_longest")
-model.save("quixo_ppo_random_opponent_longest")
+    model.save("quixo_ppo_random_opponent_longest2")
+model.save("quixo_ppo_random_opponent_longest2")

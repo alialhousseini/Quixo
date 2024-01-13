@@ -109,30 +109,22 @@ class Game(object):
             self.current_player_idx += 1
             self.current_player_idx %= len(players)
             ok = False
-            # self.print()
             while not ok:
                 from_pos, slide = players[self.current_player_idx].make_move(
                     self)
                 ok = self.move(from_pos, slide, self.current_player_idx)
-            # print(f"Player {self.current_player_idx} moved {from_pos} {slide}")
             winner = self.check_winner()
-            # self.print()
         return winner
 
     def move(self, from_pos: tuple[int, int], slide: Move, player_id: int) -> bool:
         '''Perform a move'''
-        if slide not in [Move.TOP, Move.BOTTOM, Move.LEFT, Move.RIGHT]:
-            print("Invalid move!!")
+        if player_id not in (0, 1):
             return False
-        if player_id not in [0, 1]:
-            print("Invalid player!!")
-            return False
-        # Oh God, Numpy arrays
         prev_value = deepcopy(self._board[(from_pos[1], from_pos[0])])
         acceptable = self.__take((from_pos[1], from_pos[0]), player_id)
         if acceptable:
             acceptable = self.__slide((from_pos[1], from_pos[0]), slide)
-            if not acceptable:
+            if not acceptable:  # restore previous
                 self._board[(from_pos[1], from_pos[0])] = deepcopy(prev_value)
         return acceptable
 
@@ -151,8 +143,8 @@ class Game(object):
     def acceptable_slides(from_position: tuple[int, int]):
         """When taking a piece from {from_position} returns the possible moves (slides)"""
         acceptable_slides = [Move.BOTTOM, Move.TOP, Move.LEFT, Move.RIGHT]
-        axis_0 = from_position[0]    # axis_0 = 0 means uppermost row
-        axis_1 = from_position[1]    # axis_1 = 0 means leftmost column
+        axis_0 = from_position[0]  # axis_0 = 0 means uppermost row
+        axis_1 = from_position[1]  # axis_1 = 0 means leftmost column
 
         if axis_0 == 0:  # can't move upwards if in the top row...
             acceptable_slides.remove(Move.TOP)
@@ -170,14 +162,33 @@ class Game(object):
         if slide not in self.acceptable_slides(from_pos):
             return False  # consider raise ValueError('Invalid argument value')
         axis_0, axis_1 = from_pos
-        # np.roll performs a rotation of the element of a 1D ndarray
+
         if slide == Move.RIGHT:
-            self._board[axis_0] = np.roll(self._board[axis_0], -1)
+            # pick the cube without face or with player's face and put it on the far right of the same row and push the other cubes on the left
+            self._board[axis_0] = np.concatenate(
+                (self._board[axis_0, :axis_1], self._board[axis_0,
+                 axis_1 + 1:], self._board[axis_0, axis_1]),
+                axis=None,
+            )
         elif slide == Move.LEFT:
-            self._board[axis_0] = np.roll(self._board[axis_0], 1)
+            # pick the cube without face or with player's face and put it on the far left of the same row and push the other cubes on the right
+            self._board[axis_0] = np.concatenate(
+                (self._board[axis_0, axis_1], self._board[axis_0,
+                 :axis_1], self._board[axis_0, axis_1 + 1:]),
+                axis=None,
+            )
         elif slide == Move.BOTTOM:
-            self._board[:, axis_1] = np.roll(self._board[:, axis_1], -1)
+            # pick the cube without face or with player's face and put it at the bottom on the same column and push the other cubes upwards
+            self._board[:, axis_1] = np.concatenate(
+                (self._board[:axis_0, axis_1], self._board[axis_0 +
+                 1:, axis_1], self._board[axis_0, axis_1]),
+                axis=None,
+            )
         elif slide == Move.TOP:
-            self._board[:(axis_0 + 1),
-                        axis_1] = np.roll(self._board[:(axis_0 + 1), axis_1], 1)
+            # pick the cube without face or with player's face and put it at the top on the same column and push the other cubes downwards
+            self._board[:, axis_1] = np.concatenate(
+                (self._board[axis_0, axis_1], self._board[:axis_0,
+                 axis_1], self._board[axis_0 + 1:, axis_1]),
+                axis=None,
+            )
         return True

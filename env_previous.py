@@ -44,7 +44,7 @@ class QuixoEnv(gym.Env):
         self.game.current_player_idx = 0
         
         # Check limit
-        if self.num_steps > 50: #Could be changed
+        if self.num_steps > 60: #Could be changed
             # The game must finish with a win to our agent in less than 50 moves (1 step = 1 move)
             done = True
             reward = -20

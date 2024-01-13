@@ -22,13 +22,18 @@ class MyPlayer(Player):
 
     def make_move(self, game: 'Game') -> tuple[tuple[int, int], Move]:
         action, _ = self.model.predict(game.get_board())
+        pos, slid = decode_action(action)
+        while not game.move(pos, slid, 0):
+            action, _ = self.model.predict(game.get_board())
+            pos, slid = decode_action(action)
+            print("Invalid move!!")
         return decode_action(action)
 
 
 if __name__ == '__main__':
     g = Game()
     g.print()
-    path = 'quixo_ppo_random_opponent_longest'
+    path = 'quixo_ppo_random_opponent_longest2'
     player1 = MyPlayer(path=path)
     player2 = RandomPlayer()
     counter = 0
