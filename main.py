@@ -30,7 +30,7 @@ if __name__ == '__main__':
     g.print()
     path = 'quixo_ppo_random_opponent_longest'
     player1 = MyPlayer(path=path)
-    player2 = MyPlayer(path=path)
+    player2 = RandomPlayer()
     counter = 0
     for i in range(1000):
         winner = g.play(player1, player2)
