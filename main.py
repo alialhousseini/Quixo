@@ -26,16 +26,16 @@ class MyPlayer(Player):
         while not game.move(pos, slid, 0):
             action, _ = self.model.predict(game.get_board())
             pos, slid = decode_action(action)
-            print("Invalid move!!")
+            # print("Invalid move!!")
         return decode_action(action)
 
 
 if __name__ == '__main__':
     g = Game()
     g.print()
-    path = 'quixo_ppo_random_opponent_longest2'
+    path = './/old_results//quixo_ppo_random_opponent_longest2'
     player1 = MyPlayer(path=path)
-    player2 = RandomPlayer()
+    player2 = MyPlayer(path=path)
     counter = 0
     for i in range(1000):
         winner = g.play(player1, player2)

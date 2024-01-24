@@ -11,7 +11,7 @@ import random
 def make_env():
     # choice = random.choice([0, 1])
     # if choice:
-    return QuixoEnvPrevious(opponent=Opponent("quixo_ppo_random_opponent_longest"))
+    return QuixoEnvPrevious(opponent=Opponent(".//old_results//quixo_ppo_random_opponent_longest"))
     # else:
     # return QuixoEnvRandom(opponent=RandomPlayer())
 
@@ -25,7 +25,7 @@ vec_env = make_vec_env(make_env, n_envs=5)
 
 env = make_env()
 env.reset()
-model = PPO.load("quixo_ppo_random_opponent_longest")
+model = PPO.load(".//old_results//quixo_ppo_random_opponent_longest")
 obs, _ = env.reset()
 done = False
 for i in range(1):
